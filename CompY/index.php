@@ -73,16 +73,16 @@ include 'DB.php';
           <li>
             <?php 
             $Client_Data = [];
-            $data = json_decode(file_get_contents('json_files/Clients133.json'));
+            $data = json_decode(file_get_contents('json_files/ClientsY.json'));
             for ($i=0; $i < sizeof($data); $i++) {  
-              if ($_SESSION['client_id'] == $data[$i]->clientID133) {
+              if ($_SESSION['client_id'] == $data[$i]->clientIDY) {
                 $Client_Data = $data[$i];
               }
             }
             ?>
             <a onclick="Account()"><span class="glyphicon glyphicon-user"></span>
               <?php 
-              echo $Client_Data->clientName133;
+              echo $Client_Data->clientNameY;
               ?>
             </a>
           </li>
@@ -101,7 +101,7 @@ include 'DB.php';
   <div class="container">    
     <div class="row">
       <?php  
-      $data = json_decode(file_get_contents('json_files/Parts133.json'));
+      $data = json_decode(file_get_contents('json_files/PartsY.json'));
 
       $arr_items_checkout = [];
       $arr_items_checkout_quantity = [];
@@ -111,25 +111,25 @@ include 'DB.php';
         <div class="col-sm-4">
           <div class="backcolor">
             <div class="panel-heading">
-              <?php  echo $data[$i]->partName133; ?>    
+              <?php  echo $data[$i]->partNameY; ?>    
             </div>
             <div class="panel-body">
-              <img src="img/<?php  echo $data[$i]->productImage133; ?>" width="100%" height="450">
+              <img src="img/<?php  echo $data[$i]->productImageY; ?>" width="100%" height="450">
             </div>
             <div class="panel-footer">
               Price
               <?php  
-              echo $data[$i]->currentPrice133; 
+              echo $data[$i]->currentPriceY; 
               ?>
             </div>
 
             <?php 
             $count = 0;
             $savetotal = 0; 
-            $amount = json_decode(file_get_contents('json_files/userSelected133.json'));
+            $amount = json_decode(file_get_contents('json_files/userSelectedY.json'));
 
             for ($j=0; $j < sizeof($amount); $j++) { 
-              if ($data[$i]->partNo133 == $amount[$j]->Dataid && $Client_Data->clientID133 == $amount[$j]->clientID133) {
+              if ($data[$i]->partNoY == $amount[$j]->Dataid && $Client_Data->clientIDY == $amount[$j]->clientIDY) {
                 $count++;
                 $savetotal = $amount[$j]->Totalprice;
                 $arr_items_checkout[] = $data[$i];
@@ -138,7 +138,7 @@ include 'DB.php';
             }
 
             ?>
-            <button  onclick="add('<?php echo $data[$i]->partNo133;?>', '<?php echo $count;?>', '<?php echo $data[$i]->QoH133;?>', '<?php echo $data[$i]->currentPrice133;?>')" id="btn">
+            <button  onclick="add('<?php echo $data[$i]->partNoY;?>', '<?php echo $count;?>', '<?php echo $data[$i]->QoHY;?>', '<?php echo $data[$i]->currentPriceY;?>')" id="btn">
 
               Add to Cart
 
@@ -146,7 +146,7 @@ include 'DB.php';
 
             <p id="amount"> <?php echo $count; ?> </p>
 
-            <button onclick="sub('<?php echo $data[$i]->partNo133;?>', '<?php echo $count;?>', '<?php echo $data[$i]->QoH133;?>', '<?php echo $data[$i]->currentPrice133;?>')" id="btn">
+            <button onclick="sub('<?php echo $data[$i]->partNoY;?>', '<?php echo $count;?>', '<?php echo $data[$i]->QoHY;?>', '<?php echo $data[$i]->currentPriceY;?>')" id="btn">
 
               Remove From Cart
 
@@ -193,7 +193,7 @@ include 'DB.php';
   <div id="totalcheck">
     <p> 
       <?php 
-        if ($Client_Data->Deals133 == 1) {
+        if ($Client_Data->DealsY == 1) {
           $discount = ($checkoutprice*10)/100;
           echo "The total Price of your Cart is  " . $checkoutprice . " * 10%  => " . ($checkoutprice-$discount);
         }
@@ -225,10 +225,10 @@ include 'DB.php';
     var duplicate_elements = <?php echo json_encode($arr_items_checkout); ?>;
     var userselected = <?php echo json_encode($arr_items_checkout_quantity); ?>;
     var data = <?php echo json_encode($Client_Data); ?>;
-    var client_data = <?php echo $Client_Data->Deals133; ?>;
-    var client_money_has = <?php echo $Client_Data->dollarsOnOrder133; ?>;
-    var client_money_owned = <?php echo $Client_Data->moneyOwed133; ?>;
-    var client_ID = <?php echo $Client_Data->clientID133; ?>;
+    var client_data = <?php echo $Client_Data->DealsY; ?>;
+    var client_money_has = <?php echo $Client_Data->dollarsOnOrderY; ?>;
+    var client_money_owned = <?php echo $Client_Data->moneyOwedY; ?>;
+    var client_ID = <?php echo $Client_Data->clientIDY; ?>;
     var checkoutTotalprice = <?php echo $checkoutprice ; ?>;
   </script>
   <script src="./script.js"></script>
