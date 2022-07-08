@@ -53,7 +53,6 @@ include 'DB.php';
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -66,8 +65,8 @@ include 'DB.php';
       </div>
       <div class="collapse navbar-collapse" id="myNavbar">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="index.php">Home</a></li>
-          <li><a href="statusPO.php">Status of Purchase Order</a></li>
+          <li><a href="index.php">Home</a></li>
+          <li class="active"><a href="statusPO.php">Status of Purchase Order</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li>
@@ -92,131 +91,60 @@ include 'DB.php';
     </div>
     <div class="jumbotron">
       <div class="container text-center">
-        <h1>Sports Stop</h1>      
-        <p>Online Sports Store</p>
+        <h1>Your Purchase Order Status</h1>
       </div>
     </div>
   </nav>
 
-  <div class="container">    
-    <div class="row">
-      <?php  
-      $data = json_decode(file_get_contents('json_files/PartsY.json'));
-
-      $arr_items_checkout = [];
-      $arr_items_checkout_quantity = [];
-
-      for ($i=0; $i < sizeof($data); $i++) {           
-        ?>
-        <div class="col-sm-4">
-          <div class="backcolor">
-            <div class="panel-heading">
-              <?php  echo $data[$i]->partNameY; ?>    
-            </div>
-            <div class="panel-body">
-              <img src="img/<?php  echo $data[$i]->productImageY; ?>" width="100%" height="450">
-            </div>
-            <div class="panel-footer">
-              Price
-              <?php  
-              echo $data[$i]->currentPriceY; 
-              ?>
-            </div>
-
-            <?php 
-            $count = 0;
-            $savetotal = 0; 
-            $amount = json_decode(file_get_contents('json_files/userSelectedY.json'));
-
-            for ($j=0; $j < sizeof($amount); $j++) { 
-              if ($data[$i]->partNoY == $amount[$j]->dataIDY && $Client_Data->clientIDY == $amount[$j]->clientIDY) {
-                $count++;
-                $savetotal = $amount[$j]->totalpriceY;
-                $arr_items_checkout[] = $data[$i];
-                $arr_items_checkout_quantity[] = $amount[$j];
-              }
-            }
-
-            ?>
-            <button  onclick="add('<?php echo $data[$i]->partNoY;?>', '<?php echo $count;?>', '<?php echo $data[$i]->QoHY;?>', '<?php echo $data[$i]->currentPriceY;?>')" id="btn">
-
-              Add to Cart
-
-            </button>
-
-            <p id="amount"> <?php echo $count; ?> </p>
-
-            <button onclick="sub('<?php echo $data[$i]->partNoY;?>', '<?php echo $count;?>', '<?php echo $data[$i]->QoHY;?>', '<?php echo $data[$i]->currentPriceY;?>')" id="btn">
-
-              Remove From Cart
-
-            </button>
-
-            <br>
-
-            <p id="totalamount"> <?php echo "The total Product Price is " . $savetotal; ?> </p>
-          </div>
-
-          <br>
-          <br>
-        </div>
-        <?php 
+  <main class="container-fluid text-center">
+    <p>
+    <?php 
+      $dataPO = json_decode(file_get_contents('json_files/POsY.json'));
+      for ($i=0; $i < sizeof($dataPO); $i++) {  
+        if ($_SESSION['client_id'] == $dataPO[$i]->clientIDY) {
+          echo "Purchase Order Number <b>" . $dataPO[$i]->poNoY . "</b> is <b>" . $dataPO[$i]->statusY . "</b> On this Date: <b>" . $dataPO[$i]->datePOY . "</b><br><br>";
+        }
       }
-      ?>
-    </div>
-  </div>
-
-  <br>
-  <br>
-
-  <!-- 
-    checkout button to process
-  -->
-  <?php 
-  $checkoutprice = 0;
-
-  // taking from the given link 
-  // https://itecnote.com/tecnote/php-remove-duplicates-from-an-array-based-on-object-property/
-  // https://www.php.net/manual/en/function.rsort.php
-  // on june 24, 2022
-
-  rsort($arr_items_checkout_quantity);
-
-  $filtered = array_intersect_key($arr_items_checkout_quantity, array_unique(array_column($arr_items_checkout_quantity, 'dataIDY')));
-
-  foreach ($filtered as $key => $value) {
-    $checkoutprice += $value->totalpriceY;
-  }
-
-  ?>
-
-  <div id="totalcheck">
-    <p> 
-      <?php 
-        if ($Client_Data->DealsY == 1) {
-          $discount = ($checkoutprice*10)/100;
-          echo "The total Price of your Cart is  " . $checkoutprice . " * 10%  => " . ($checkoutprice-$discount);
-        }
-        else{
-          echo "The total Price of your Cart is  " . $checkoutprice;
-        }
-      ?> 
+    ?>
     </p>
+    <form method="post" accept="" id="style">
+      <label>Purchase Order Number</label>
+      <input type="number" size="100" name="number" value="number" placeholder="Purchase Order Number" required/>
+      <button type="Submit" name="Submit" value="Submit" class="btn-danger">Submit</button>
+    </form>
+    <br>
+    <br>
+  </main>
 
-    <button type="button" id="Checkout" onclick="checkoutcart(<?php echo $checkoutprice; ?>)">
-      Checkout your Cart
-    </button>
-  </div>
+  <?php 
+    include('DB.php');
 
-  <!-- 
-    footer 
-  -->
-  <footer class="container-fluid text-center">
-    <p>Online Store Copyright</p>  
-    Get 10% off:
-    <input type="email" size="50" placeholder="Email Address" id="imput">
-    <button onclick="deals()" id="disable">Get Deal</button>
-  </footer>
+    if (isset($_POST['Submit'])) {
+      $pos = $_POST['number'];
+      $line = json_decode(file_get_contents('json_files/LinesY.json'));
+      $posArray = json_decode(file_get_contents('json_files/POsY.json'));
+      $alldata = [];
+      for ($i=0; $i < sizeof($line); $i++) {  
+        if($pos === $line[$i]->poNoY){
+          for ($j=0; $j < sizeof($posArray); $j++) { 
+            if ($posArray[$j]->poNoY === $pos && $posArray[$j]->clientIDY ===  $Client_Data->clientIDY) {
+              $alldata[] = $line[$i];
+            }
+          }
+        } 
+      }
+
+      if (count($alldata) !== 0) {
+        echo "<pre>";
+        print_r( $alldata );
+        echo "</pre>";
+      }
+      else{
+        echo "Wrong Purchase Order Number";
+      }
+
+    } 
+  ?>
 
   <!--  
     my javascript
